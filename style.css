@@ -1,0 +1,238 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
+link {
+    display: none;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Mengunci scroll pada seluruh halaman */
+}
+
+footer {
+    position: fixed; /* Meletakkan footer di posisi tetap */
+    bottom: 0;
+    left: 0;
+    width: 100%;
+}
+
+main {
+    flex-grow: 1; /* Membuat konten utama memenuhi sisa ruang di dalam container */
+  }
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px 10%;
+    background: transparent;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 2;
+}
+
+
+.home {
+    height: 100vh;
+    background: url('petaindonesia.jpg') no-repeat;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 10%;
+}
+
+.home-content {
+    background: transparent;
+    margin-top: 120px;
+    max-width: 2000px;
+    text-align: center;
+}
+
+.home-content h1 {
+    position: relative;
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 20px 40px 40px;
+    color: #081b29;
+    text-align: justify;
+    z-index: 2;
+}
+
+.home-content h1::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.home-content p {
+    position: relative;
+    font-size: 20px;
+    margin: 20px 40px 40px;
+    color: #081b29;
+    text-align: justify;
+    z-index: 2;
+}
+
+.home-content p::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.home-content .btn-box {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    width: 600px;
+    height: 100%;
+    margin: auto;
+}
+
+.home-content .btn-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.btn-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100;
+}
+
+.btn-box {
+    display: inline-block;
+}
+
+.btn-box a {                /*untuk semua*/
+    margin: 0 10px;
+    position: relative;
+    display: inline-flex;
+    justify-content:center;
+    align-items: center;
+    width: 100%;
+    height: 100px;
+    background: transparent;
+    border: 2px solid #081b29;
+    border-radius: 20px;
+    font-size: 19px;
+    color: #081b29;
+    text-decoration: none;
+    font-weight: 600;
+    letter-spacing: 1px;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.btn-box a:hover {                   /*tulisan luas atap*/
+    color: white;
+}
+
+.btn-box a:nth-child(2) {           /*tulisan luas area*/
+    background: transparent;
+    color: #081b29;
+    margin-left: auto;
+}
+
+.btn-box a:nth-child(2):hover {
+    color: white;
+    
+}
+
+.btn-box a:nth-child(2)::before {
+    background: #081b29;
+}
+
+.btn-box a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background: #081b29;
+    color: #081b29;
+    z-index: -1;
+}
+
+.btn-box a:hover::before {
+    width: 100%;
+}
+
+.bali-imgHover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:#E0FFFF;
+    opacity: .8;
+    transition: 2s;
+}
+
+.bali-imgHover:hover {
+    background: #E0FFFF;
+    opacity: .8;
+}
+
+.bali-imgHover ::after {
+    content: '';
+    position: center;
+    top: 50%;
+    right: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+}
+
+.bottom {
+    background-color: #081b29;
+    color: white;
+    padding: 1rem;
+    text-align: center;
+    width: 100%;
+}
+
+.fadeIn {
+    opacity: 1;  /* Mulai dari opacity penuh ( terlihat jelas ) */
+    animation: fadeIn 3s ease-in-out;  /* Animasi fade out selama 3 detik */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }  /* Opacity menjadi 0 ( tidak terlihat ) */
+}
+
+.container {
+    width: 80%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+h1 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}

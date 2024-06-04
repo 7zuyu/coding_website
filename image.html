@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Result</title>
+</head>
+<body>
+  <!-- Container for the title -->
+  <h1 id="pageTitle"></h1>
+  
+  <!-- Container for the images -->
+  <div id="mapImageContainer">
+    <img id="mapImage" src="/Tugas Akhir/coding_website/polygon_image.png" alt="Polygon Image">
+  </div>
+  <div id="mapImageContainer1">
+    <img id="mapImage1" src="/Tugas Akhir/coding_website/plot_image.png" alt="Intensity Plot">
+  </div>
+  <div id="mapImageContainer2">
+    <img id="mapImage2" src="/Tugas Akhir/coding_website/map_image.png" alt="Map Image">
+  </div>
+  
+  <!-- Button to navigate back -->
+  <button onclick="goBack()">Kembali</button>
+
+  <script>
+    // Function to navigate back to the previous page
+    function goBack() {
+      window.history.back();
+    }
+  
+    // Function to parse query parameters from URL
+    function getQueryParams() {
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      const selectedMonth = urlParams.get('month');
+      const selectedYear = urlParams.get('year');
+      return { selectedMonth, selectedYear };
+    }
+  
+    // Function to set page title with selected month and year
+    function setPageTitle() {
+      const { selectedMonth, selectedYear } = getQueryParams();
+      const pageTitle = document.getElementById('pageTitle');
+      pageTitle.innerText = `Result - ${selectedMonth} ${selectedYear}`;
+    }
+  
+    // Call setPageTitle function when the page loads
+    setPageTitle();
+  </script>  
+</body>
+</html>

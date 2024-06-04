@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "express": "^4.19.2",
+    "html2canvas": "^1.4.1"
+  }
+}

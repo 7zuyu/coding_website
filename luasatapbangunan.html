@@ -1,0 +1,554 @@
+ini kode html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perhitungan Luas Atap Bangunan</title>
+  <link rel="stylesheet" href="luasatapbangunan.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <link rel="icon" href="pcu.png" type="image/x-icon">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-draw/dist/leaflet.draw.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://unpkg.com/leaflet-draw/dist/leaflet.draw.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Turf.js/5.1.6/turf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Menghitung Luasan Atap Bangunan</h1>
+    <div>
+      <button id="startDrawing">Mulai Menggambar</button>
+      <button id="finishDrawing">Selesai Menggambar</button>
+      <button id="osmTiles">Tampilkan OSM Tiles</button>
+      <button id="cartoTiles">Tampilkan CARTO Tiles</button>
+      <label for="month">Pilih Bulan:</label>
+      <select id="month">
+        <option value="January">January</option>
+        <option value="February">February</option>
+        <option value="March">March</option>
+        <option value="April">April</option>
+        <option value="May">May</option>
+        <option value="June">June</option>
+        <option value="July">July</option>
+        <option value="August">August</option>
+        <option value="September">September</option>
+        <option value="October">October</option>
+        <option value="November">November</option>
+        <option value="December">December</option>
+      </select>
+      <label for="year">Pilih Tahun:</label>
+      <select id="year">
+        <option value="2011">2011</option>
+        <option value="2012">2012</option>
+        <option value="2013">2013</option>
+        <option value="2014">2014</option>
+        <option value="2015">2015</option>
+        <option value="2016">2016</option>
+        <option value="2017">2017</option>
+        <option value="2018">2018</option>
+        <option value="2019">2019</option>
+        <option value="2020">2020</option>
+      </select>
+    </div>
+  </header>
+  <section class="home">
+    <div id="result"></div>
+    <div id="mapContainer">
+      <div id="map"></div>
+    </div>    
+    <div id="intensity-result" style="position: relative; width: 100%; max-width: 300px; margin: auto; display: none;">
+      <h2>Data GHI</h2>
+      <button id="close-intensity" style="position: absolute; top: 0; right: 0;">&times;</button>
+      <ul id="intensity-list" class="ghi-popup-content"></ul>
+    </div>
+    <div id="plot-container" style="position: relative; display: none;">
+      <h2>Intensity Plot</h2>
+      <button id="close-plot" style="position: absolute; top: 0; right: 0;">&times;</button>
+      <img id="intensity-plot" alt="Intensity Plot" />
+    </div>
+    <div id="mapImageContainer"></div>
+  </section>
+  <footer>
+    <div class="bottom">
+        <p id="area-info">Luasan: 0 m<sup>2</sup></p>
+        <p id="luas-keseluruhan">Luas Keseluruhan: 0 m<sup>2</sup></p>
+        <p id="luas-tertentu">Luas Tertentu: 0 m<sup>2</sup></p>
+        <p id="persentase-luas">Persentase Luas: 0%</p>
+        <!-- Tambahkan elemen ini untuk menampilkan total GHI -->
+        <p id="total-ghi">Total GHI: 0 kWh/m<sup>2</sup>/month</p>
+    </div>
+</footer>
+
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    .leaflet-container {
+      height: 70%;
+      width: 100%;
+    }
+    #close-plot, #close-intensity {
+      background: none;
+      border: none;
+      font-size: 3em;
+      cursor: pointer;
+    }
+    #close-plot:hover, #close-intensity:hover {
+      color: red;
+    }
+    #intensity-result {
+      position: relative;
+      width: 100%;
+      max-width: 310px;
+      margin: auto;
+      display: none;
+      overflow-y: scroll;
+      max-height: 700px;
+    }
+    #intensity-list {
+      padding: 0;
+      margin: 0;
+      list-style-type: none;
+    }
+    .ghi-popup-content {
+      font-size: 0.8em; /* Adjust the font size as needed */
+    }
+    /* Memperbesar tombol zoom */
+    .leaflet-control-zoom-in,
+    .leaflet-control-zoom-out {
+      font-size: 20px !important; /* Sesuaikan ukuran sesuai kebutuhan */
+    }
+
+    /* Memperbesar kontrol gambar */
+    .leaflet-draw-toolbar a {
+      font-size: 20px !important; /* Sesuaikan ukuran sesuai kebutuhan */
+    }
+  </style>
+  <script>
+    const map = L.map('map').setView([-7.33, 112.72], 12);
+
+const osmTiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+});
+
+const cartoTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
+  maxZoom: 19,
+  attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+});
+
+// Add initial tile layer to the map
+osmTiles.addTo(map);
+
+document.getElementById('osmTiles').onclick = function() {
+  map.removeLayer(cartoTiles);
+  osmTiles.addTo(map);
+};
+
+document.getElementById('cartoTiles').onclick = function() {
+  map.removeLayer(osmTiles);
+  cartoTiles.addTo(map);
+};
+const marker = L.marker([-7.31, 112.72]).addTo(map)
+
+.bindPopup('<b>Hello!</b><br />I am in Surabaya.');
+const popup = L.popup();
+marker.on('popupopen', function() {
+  const popup = this.getPopup();
+  const latlng = this.getLatLng();
+  const selectedMonth = document.getElementById('month').value;
+  const selectedYear = document.getElementById('year').value;
+  const data = {
+      latitude: latlng.lat,
+      longitude: latlng.lng,
+      month: selectedMonth,
+      year: selectedYear
+  };
+
+  fetch('http://localhost:5000/get_intensitas', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+  })
+  .then(response => {
+      if (!response.ok) {
+          throw new Error('Network response was not ok');
+      }
+      return response.json();
+  })
+  .then(data => {
+      popup.setContent(`Lat: ${latlng.lat}, Lon: ${latlng.lng}.<br>GHI: ${data.intensitas} kWh/m2`);
+  })
+  .catch(error => {
+      console.error('Error:', error);
+      popup.setContent('Failed to fetch intensity data.');
+  });
+});
+
+marker.openPopup();
+
+const drawnItems = new L.FeatureGroup();
+const drawControl = new L.Control.Draw({
+  draw: {
+      polygon: true,
+      polyline: false,
+      circle: true,
+      marker: false,
+      circlemarker: false,
+      rectangle: true,
+  },
+  edit: {
+      featureGroup: drawnItems,
+  },
+});
+
+map.addLayer(drawnItems);
+map.addControl(drawControl);
+
+map.on(L.Draw.Event.CREATED, function (e) {
+    const layer = e.layer;
+    drawnItems.addLayer(layer);
+});
+
+document.getElementById('startDrawing').onclick = function() {
+    map.addLayer(drawnItems);
+    map.addControl(drawControl);
+};
+
+function layerToGeoJSON(layer) {
+  if (layer instanceof L.Circle) {
+      const latlng = layer.getLatLng();
+      const radius = layer.getRadius();
+      const options = { steps: 64, units: 'meters' }; // Adjust the number of steps for more detail
+      const circlePolygon = turf.circle([latlng.lng, latlng.lat], radius, options);
+      return circlePolygon;
+  } else {
+      return layer.toGeoJSON();
+  }
+}
+
+let totalArea = 0;
+let specificArea = 0;
+let lastDrawnPolygon = null;
+
+function calculateTotalArea() {
+  totalArea = 0;
+  drawnItems.eachLayer(function(layer) {
+      const geojson = layerToGeoJSON(layer);
+      const area = turf.area(geojson);
+      totalArea += area;
+  });
+  //document.getElementById('luas-keseluruhan').textContent = `Luas Keseluruhan: ${(totalArea / 10000).toFixed(4)} ha`;
+  calculatePercentage();
+}
+
+function calculatePercentage() {
+  if (totalArea > 0) {
+      const percentage = (specificArea / totalArea) * 100;
+      document.getElementById('persentase-luas').textContent = `Persentase Luas: ${percentage.toFixed(2)}%`;
+  } else {
+      document.getElementById('persentase-luas').textContent = `Persentase Luas: 0%`;
+  }
+}
+
+// Fungsi untuk menyimpan gambar peta yang sudah dipotong berdasarkan batas poligon
+function saveCroppedMapImage(bounds) {
+  const mapContainer = document.getElementById('mapContainer');
+  html2canvas(mapContainer, {
+    useCORS: true, // Untuk mengatasi masalah cross-origin
+    scrollX: -window.scrollX,
+    scrollY: -window.scrollY,
+    windowWidth: window.innerWidth,
+    windowHeight: window.innerHeight,
+    width: bounds.getSize().x,
+    height: bounds.getSize().y,
+    x: bounds.min.x,
+    y: bounds.min.y,
+  }).then(canvas => {
+    // Konversi canvas yang sudah dipotong ke base64 string
+    const imageData = canvas.toDataURL('image/png');
+
+    // Kirim base64 string gambar ke server
+    sendImageToServer(imageData);
+  });
+}
+
+
+// Fungsi untuk mengunggah gambar yang sudah dipotong ke server
+function sendImageToServer(imageData) {
+  fetch('http://localhost:5000/save_cropped_map_image', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ image: imageData })
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Gagal menyimpan gambar ke server');
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log(data.message); // Pesan sukses dari server
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+}
+
+document.getElementById('finishDrawing').onclick = function() {
+  const selectedMonth = document.getElementById('month').value;
+  const selectedYear = document.getElementById('year').value;
+
+  map.removeControl(drawControl);
+  map.removeLayer(drawnItems);
+
+  const features = drawnItems.getLayers().map(layer => layerToGeoJSON(layer));
+  lastDrawnPolygon = features.length > 0 ? drawnItems.getLayers().slice(-1)[0] : null; // Ambil poligon terakhir
+
+  sendDataToServer(features, selectedMonth, selectedYear);
+  const polygonCoords = features[0].geometry.coordinates[0]; // Misalnya mengambil koordinat dari fitur pertama
+
+  savePolygonImage(features);
+  calculateTotalArea();
+
+  // Update footer data
+  document.getElementById('luas-keseluruhan').textContent = `Luas Keseluruhan :  ${formatNumber(totalArea.toFixed(2))} m²`;
+  document.getElementById('luas-tertentu').textContent = `Luas Area Tersedia : ${formatNumber(specificArea.toFixed(2))} m²`;
+  document.getElementById('persentase-luas').textContent = ((specificArea / totalArea) * 100).toFixed(2) + '%';
+
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = map.getSize().x;
+  canvas.height = map.getSize().y;
+
+  const mapPane = map._panes.mapPane;
+  const mapTransform = mapPane.style.transform;
+  mapPane.style.transform = '';
+
+  const originalMapSize = map.getSize();
+  const originalMapZoom = map.getZoom();
+
+  map.setView(map.getBounds().getCenter(), originalMapZoom, {
+    animate: false,
+    pan: {
+      duration: 0
+    }
+  });
+
+  map.eachLayer(function (layer) {
+    if (layer instanceof L.TileLayer) {
+      for (const key in layer._tiles) {
+        if (layer._tiles.hasOwnProperty(key)) {
+          const tile = layer._tiles[key];
+          if (tile.current && tile.loaded && tile._tilePoint) {
+            ctx.drawImage(tile.el, tile._tilePoint.x, tile._tilePoint.y);
+          }
+        }
+      }
+    }
+  });
+  
+  mapPane.style.transform = mapTransform;
+  map.setView(map.getBounds().getCenter(), originalMapZoom, {
+    animate: false,
+    pan: {
+      duration: 0
+    }
+  });
+
+  const imgData = canvas.toDataURL('image/png');
+   // Panggil fungsi untuk menyimpan gambar peta
+
+  setTimeout(function() {
+        window.open(`image.html?month=${selectedMonth}&year=${selectedYear}`, '_blank');
+      }, 3000); // Waktu dihitung dalam milidetik, 5000 untuk 5 detik
+};
+
+// Modifikasi sendDataToServer untuk menyimpan poligon sebagai gambar sebelum mengirimnya ke server
+function sendDataToServer(data, selectedMonth, selectedYear) {
+  const drawnItemsLayers = drawnItems.getLayers();
+  if (drawnItemsLayers.length === 0) {
+      console.error("No polygon has been drawn.");
+      return;
+  }
+
+  const polygonLayer = drawnItemsLayers[0]; // Ambil poligon pertama (asumsikan hanya ada satu poligon yang digambar)
+  const geoJSONLayer = layerToGeoJSON(polygonLayer);
+
+  if (!geoJSONLayer.geometry.coordinates[0] || geoJSONLayer.geometry.coordinates[0].length === 0) {
+      console.error("Invalid polygon coordinates.");
+      return;
+  }
+
+  fetch('http://localhost:5000/get_coordinates_with_intensity', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+          features: [geoJSONLayer],
+          month: selectedMonth,
+          year: selectedYear
+      })
+  })
+  .then(response => response.json())
+  .then(data => {
+    
+        console.log(data);
+        displayIntensityData(data.intensity_data);
+    
+        // Update footer with total GHI
+        document.getElementById('total-ghi').textContent = `Total GHI: ${formatNumber(data.total_GHI.toFixed(2))} kWh/m²/month`;
+  })
+  .catch(error => {
+      console.error('Error:', error);
+  });
+
+  fetch('http://localhost:5000/get_intensity_plot', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+          features: [geoJSONLayer],
+          month: selectedMonth,
+          year: selectedYear
+      })
+  })
+  .then(response => response.blob()) 
+  .then(blob => {
+      const url = URL.createObjectURL(blob);
+      const img = document.getElementById('intensity-plot');
+      img.src = url;
+      document.getElementById('plot-container').style.display = 'block'; // Show plot-container
+  })
+  .catch(error => {
+      console.error('Error fetching intensity plot:', error);
+  });  
+}
+
+function displayIntensityData(intensityData) {
+  const intensityResultDiv = document.getElementById('intensity-result');
+  intensityResultDiv.style.display = 'block'; 
+  const intensityList = document.getElementById('intensity-list');
+  intensityList.innerHTML = ''; 
+
+  Object.entries(intensityData).forEach(([coord, intensity]) => {
+      const [latitude, longitude] = coord.split(',').map(parseFloat);
+      const listItem = document.createElement('li');
+      listItem.textContent = `Lat: ${latitude.toFixed(2)}, Lon: ${longitude.toFixed(2)}, GHI: ${intensity} kWh/m2`;
+      intensityList.appendChild(listItem);
+  });
+}
+
+function savePolygonImage(features) {
+  fetch('http://localhost:5000/save_polygon_image', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ features: features })
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Gagal menyimpan gambar polygon');
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log(data.message); // Pesan sukses dari server
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+}
+
+
+function onMapClick(e) {
+  const selectedMonth = document.getElementById('month').value;
+  const selectedYear = document.getElementById('year').value;
+
+  const data = {
+    latitude: e.latlng.lat,
+    longitude: e.latlng.lng,
+    month: selectedMonth,
+    year: selectedYear
+  };
+
+  fetch('http://localhost:5000/get_intensitas', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => response.json())
+  .then(data => {
+    popup
+      .setLatLng(e.latlng)
+      .setContent(`Lat:${e.latlng.lat.toFixed(2)}, Long:${e.latlng.lng.toFixed(2)} <br>GHI : ${data.intensitas} kWh/m2`)
+      .openOn(map);
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+}
+
+map.on('click', onMapClick);
+
+
+document.getElementById('close-plot').onclick = function() {
+   document.getElementById('plot-container').style.display = 'none';
+};
+
+document.getElementById('close-intensity').onclick = function() {
+    document.getElementById('intensity-result').style.display = 'none';
+};
+
+function calculateArea(layer) {
+  if (layer instanceof L.Polygon) {
+    const area = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]);
+    return area;
+  } else if (layer instanceof L.Circle) {
+    const radius = layer.getRadius();
+    return Math.PI * radius * radius;
+  } else {
+    console.error('Layer bukan merupakan polygon atau lingkaran.');
+    return 0;
+  }
+}
+
+function formatNumber(number) {
+  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function updateAreaInfo(area) {
+  const areaInfo = document.getElementById('area-info');
+  const formattedArea = formatNumber(area.toFixed(2)); // Format area with 2 decimal places
+  areaInfo.textContent = `Luasan: ${formattedArea} m²`;
+}
+
+map.on(L.Draw.Event.CREATED, function (e) {
+  const layer = e.layer;
+  drawnItems.addLayer(layer);
+  const area = calculateArea(layer);
+  updateAreaInfo(area);
+});
+
+drawnItems.on('edit', function (e) {
+  const layers = e.layers;
+  layers.eachLayer(function (layer) {
+      const area = calculateArea(layer);
+      updateAreaInfo(area);
+  });
+});
+  </script>
+</body>
+</html>

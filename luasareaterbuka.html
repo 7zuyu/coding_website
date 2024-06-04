@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Perhitungan Luas Area Terbuka</title>
+  <link rel="stylesheet" href="luasareaterbuka.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <link rel="icon" href="pcu.png" type="image/x-icon">
+</head>
+<body>
+  <header>
+    <h1>Menghitung Luasan Area Terbuka</h1>
+    <div id="options">
+      <label for="method">Pilih Metode:</label>
+      <select id="method">
+        <option value="metode1">Menghitung Luasan Area Terbuka</option>
+        <option value="metode2">Intensitas cahaya</option>
+      </select>
+      <button id="calculate-btn">Hitung</button>
+    </div>
+  </header>
+  <section class="home">
+    <div id="map"></div>
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+      }
+      .leaflet-container {
+        height: 700px;
+        width: 1920px;
+      }
+    </style>
+    <script>
+      const map = L.map('map').setView([-7.33, 112.72], 10);
+      const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      }).addTo(map);
+      const marker = L.marker([-7.31, 112.72]).addTo(map)
+      .bindPopup('<b>Hello!</b><br />I am in Surabaya.');
+      const popup = L.popup();
+      marker.on('popupopen', function() {
+        const popup = this.getPopup(); // Dapatkan popup yang terkait dengan marker
+        const latlng = this.getLatLng(); // Dapatkan koordinat marker
+    
+        // Membuat objek data dengan latitude dan longitude aktual
+        const data = {
+            latitude: latlng.lat,
+            longitude: latlng.lng
+        };
+    
+        // Melakukan permintaan POST ke endpoint Flask untuk mendapatkan intensitas cahaya
+        fetch('http://localhost:5000/get_intensitas', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Menampilkan hasil intensitas cahaya di dalam popup
+            popup.setContent(`The position indicates at latitude: ${latlng.lat}, longitude: ${latlng.lng}. Intensitas cahaya: ${data.intensitas}`);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+    
+    // Buka popup pada marker secara otomatis
+    marker.openPopup();
+      function onMapClick(e) {
+          // Mendapatkan latitude dan longitude dari event klik peta
+          const data = {
+          latitude : e.latlng.lat.toFixed(2), // Membulatkan latitude menjadi 2 desimal
+          longitude : e.latlng.lng.toFixed(2) // Membulatkan longitude menjadi 2 desimal
+        };
+        // Melakukan permintaan POST ke endpoint Flask
+        fetch('http://localhost:5000/get_intensitas', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Menampilkan hasil intensitas cahaya di popup
+            popup
+  .setLatLng(e.latlng)
+  // Menampilkan pesan latitude dan longitude dalam popup
+  .setContent(`Latitude: ${e.latlng.lat.toFixed(2)}, Longitude: ${e.latlng.lng.toFixed(2)} Intensitas cahaya : ${data.intensitas}`)
+  .openOn(map);
+
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        }); 
+      }
+      map.on('click', onMapClick); // Menambahkan event listener untuk menangani klik pada peta
+    </script>
+  </section>
+  <div class="kotak">
+    <h1><strong>Keterangan:</strong></h1>
+    <p>Warna merah: batasan darat</p>
+    <p>Warna abu-abu: bagian atap</p>
+    <p>Warna putih: jalan</p>
+    <p>Warna krem: area terbuka</p>
+  </div>
+  <div class="search-container">
+    <div class="search-box">
+      <input type="text" placeholder="Mau cari apa?">
+      <div class="search-icon">
+        <i class="fas fa-search"></i>
+      </div>
+      <div class="cancel-icon">
+        <i class="fas fa-times"></i>
+      </div>
+      <div class="search-data"></div>
+    </div>
+    <script>
+      const searchBox = document.querySelector(".search-box");
+      const searchBtn = document.querySelector(".search-icon");
+      const cancelBtn = document.querySelector(".cancel-icon");
+      const searchInput = document.querySelector("input");
+      const searchData = document.querySelector(".search-data");
+      searchBtn.onclick = () => {
+        searchBox.classList.add("active");
+        searchBtn.classList.add("active");
+        searchInput.classList.add("active");
+        cancelBtn.classList.add("active");
+        searchInput.focus();
+        if (searchInput.value != "") {
+          const values = searchInput.value;
+          searchData.classList.remove("active");
+          searchData.innerHTML = "You just typed " + "<span style='font-weight: 500;'>" + values + "</span>";
+        } else {
+          searchData.textContent = "";
+        }
+      }
+      cancelBtn.onclick = () => {
+        searchBox.classList.remove("active");
+        searchBtn.classList.remove("active");
+        searchInput.classList.remove("active");
+        cancelBtn.classList.remove("active");
+        searchData.classList.toggle("active");
+        searchInput.value = "";
+      }
+    </script>
+  </div>
+  <footer>
+    <div class="bottom">
+      <p>copyright &copy; 2024</p>
+    </div>
+  </footer>
+</body>
+</html>
