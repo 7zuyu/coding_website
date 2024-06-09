@@ -17,6 +17,7 @@ import json
 import os
 from dotenv import load_dotenv
 from datetime import datetime
+import time
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
@@ -31,10 +32,10 @@ def create_connection():
     try:
         logging.info("Trying to establish connection to the database...")
         connection = pymysql.connect(
-            host=os.getenv('DB_HOST', 'localhost'),
-            user=os.getenv('DB_USER', 'root'),
-            password=os.getenv('DB_PASSWORD', 'root123'),
-            database=os.getenv('DB_NAME', 'tugas_akhir'),
+            host=os.getenv('DB_HOST'),
+            user=os.getenv('DB_USER'),
+            password=os.getenv('DB_PASSWORD'),
+            database=os.getenv('DB_NAME'),
             charset='utf8mb4',
             cursorclass=pymysql.cursors.DictCursor
         )
@@ -114,10 +115,24 @@ def get_coordinates_with_intensity():
     selectedYear = data['year']
     step = data.get('step', 0.04)
     
+    selectedYear1 = int(data['year'])
+    
     coordinates = []
     intensity_data = {}
     total_GHI = 0  # Inisialisasi total GHI
     total_GHI1 = 0
+    total_GHI2 = 0
+    
+    # Days in each month
+    days_in_month = {
+        'January': 31, 'February': 28, 'March': 31, 'April': 30, 'May': 31, 'June': 30,
+        'July': 31, 'August': 31, 'September': 30, 'October': 31, 'November': 30, 'December': 31
+    }
+    # Adjust for leap years
+    if selectedMonth == 'February' and selectedYear1 in [2012, 2016, 2020]:
+        days_in_month['02'] = 29    
+        
+        logging.info(f"Selected month: {selectedMonth}, Selected year: {selectedYear}, Days in month: {days_in_month[selectedMonth]}")
     
     for feature in data['features']:
         geometry = feature['geometry']
@@ -128,9 +143,15 @@ def get_coordinates_with_intensity():
                 intensity = find_intensity(lat, lon, selectedMonth, selectedYear)
                 coordinates.append({'latitude': lat, 'longitude': lon, 'intensitas': intensity})
                 intensity_data[f"{lat},{lon}"] = intensity
+                logging.info(f"Intensity for ({lat}, {lon}): {intensity}")
                 if intensity is not None:
-                    total_GHI1 += intensity  # Menambahkan GHI ke total
-                    total_GHI = total_GHI1*24*28
+                    total_GHI2 += intensity  # Menambahkan GHI ke total
+                    total_GHI1 = total_GHI2*8
+                    logging.info(f"Total GHI1 after ({lat}, {lon}): {total_GHI1}")
+                    logging.info(f"Total GHI: {total_GHI}")
+                    
+    if selectedMonth in days_in_month:
+        total_GHI = total_GHI1 * days_in_month[selectedMonth] / 1000
 
     # Kirim respons ke klien dengan total GHI
     return jsonify({'coordinates': coordinates, 'intensity_data': intensity_data, 'total_GHI': total_GHI})
@@ -240,7 +261,7 @@ def save_map_image():
     image = Image.open(io.BytesIO(image_data))
 
     # Simpan gambar ke lokasi yang diinginkan
-    save_path = os.path.join('D:\\', 'Tugas Akhir', 'coding_website', 'map_image.png')
+    save_path = os.path.join('D:\\', 'Tugas Akhir', 'coding_website_copy', 'map_image.png')
     image.save(save_path)
 
     response = jsonify({'message': 'Gambar peta berhasil disimpan'})
@@ -248,8 +269,12 @@ def save_map_image():
     
     return response, 200
 
+
+
 @app.route('/save_cropped_map_image', methods=['POST'])
 def save_cropped_map_image():
+    start_time = time.time()  # Catat waktu sebelum fungsi berjalan
+    
     data = request.json
     image_data = data['image']
     
@@ -262,7 +287,106 @@ def save_cropped_map_image():
     # Simpan gambar
     image.save('cropped_map_image.png')
 
-    return jsonify({'message': 'Gambar berhasil disimpan!'})
+    end_time = time.time()  # Catat waktu setelah fungsi selesai
+    
+    execution_time = end_time - start_time  # Hitung durasi eksekusi
+    logging.info(f"save_cropped_map_image function execution time: {execution_time:.4f} seconds")
+
+    return jsonify({'message': 'Gambar berhasil disimpan!', 'execution_time': execution_time})
+
+
+def hitung_luas_area_keseluruhan(gambar):
+    gray = cv2.cvtColor(gambar, cv2.COLOR_BGR2GRAY)
+
+    _, thresholded = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
+
+    contours, _ = cv2.findContours(thresholded, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    luas_total = 0
+    for contour in contours:
+        luas = cv2.contourArea(contour)
+        luas_total += luas
+
+    return contours, luas_total
+
+def hitung_luas_area_tertentu(gambar, lower_color, upper_color):
+
+    rgb = cv2.cvtColor(gambar, cv2.COLOR_BGR2RGB)
+
+    # Buat masker untuk warna tertentu
+    mask = cv2.inRange(rgb, lower_color, upper_color)
+
+    # Temukan kontur objek berdasarkan masker
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    luas_total = 0
+    for contour in contours:
+        # Hitung luas setiap kontur
+        luas = cv2.contourArea(contour)
+        luas_total += luas
+
+    return mask, contours, luas_total
+
+@app.route('/analyze_polygon_image', methods=['POST'])
+def analyze_polygon_image():
+    # Baca gambar
+    gambar = cv2.imread('cropped_map_image.png')
+
+    if gambar is None:
+        logging.error("Failed to read the saved polygon image in analyze_polygon_image.")
+        return jsonify({'error': 'Gambar tidak ditemukan atau gagal dibaca'}), 404
+
+    # Hitung luas area keseluruhan
+    contours_keseluruhan, luas_keseluruhan = hitung_luas_area_keseluruhan(gambar)
+
+    # Rentang warna area terbuka dalam ruang warna RGB
+    lower_color = np.array([245, 242, 235])  # Nilai minimum RGB untuk area terbuka
+    upper_color = np.array([255, 250, 245])  # Nilai maksimum RGB untuk area terbuka
+
+    # Hitung luas area dengan warna area terbuka
+    mask, contours_tertentu, luas_tertentu = hitung_luas_area_tertentu(gambar, lower_color, upper_color)
+
+    # Hitung persentase luas area atap bangunan yang tersedia
+    if luas_keseluruhan > 0:
+        persentase_luas = (luas_tertentu / luas_keseluruhan) * 100
+    else:
+        persentase_luas = 0
+
+    # Log the calculated areas and percentage
+    logging.info(f"Luas keseluruhan: {luas_keseluruhan}")
+    logging.info(f"Luas area terbuka: {luas_tertentu}")
+    logging.info(f"Persentase luas: {persentase_luas}%")
+
+    # Gambar kontur pada gambar asli untuk visualisasi
+    gambar_kontur_keseluruhan = gambar.copy()
+    cv2.drawContours(gambar_kontur_keseluruhan, contours_keseluruhan, -1, (0, 255, 0), 2)
+
+    gambar_kontur_tertentu = gambar.copy()
+    cv2.drawContours(gambar_kontur_tertentu, contours_tertentu, -1, (255, 0, 0), 2)
+
+    # Save the images to a BytesIO object
+    kontur_keseluruhan_img = io.BytesIO()
+    cv2.imwrite('kontur_keseluruhan.png', gambar_kontur_keseluruhan)
+    with open('kontur_keseluruhan.png', 'rb') as f:
+        kontur_keseluruhan_img.write(f.read())
+    kontur_keseluruhan_img.seek(0)
+
+    kontur_tertentu_img = io.BytesIO()
+    cv2.imwrite('kontur_tertentu.png', gambar_kontur_tertentu)
+    with open('kontur_tertentu.png', 'rb') as f:
+        kontur_tertentu_img.write(f.read())
+    kontur_tertentu_img.seek(0)
+
+    # Prepare response data
+    response_data = {
+        'luas_keseluruhan': luas_keseluruhan,
+        'luas_tertentu': luas_tertentu,
+        'persentase_luas': persentase_luas,
+        'kontur_keseluruhan_img': base64.b64encode(kontur_keseluruhan_img.getvalue()).decode('utf-8'),
+        'kontur_tertentu_img': base64.b64encode(kontur_tertentu_img.getvalue()).decode('utf-8')
+    }
+
+    return jsonify(response_data)
 
 if __name__ == '__main__':
     app.run(debug=True)
