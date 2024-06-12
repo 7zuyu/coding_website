@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Result</title>
+    <link rel="stylesheet" href="result.css">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <link rel="icon" href="pcu.png" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <h1>Results of Calculating Area of ​The Building's Roof&nbsp;</h1>
+        <!-- Container for the title -->
+        <h1 id="pageTitle"></h1>
+    </header>
+    <div class="home swiper-container">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide plot">
+                <div class="image-container">
+                    <img id="mapImage" src="/ebtmapweb_prj/coding_website/polygon_image.png" alt="Polygon Image">
+                </div>
+            </div>
+            <div class="swiper-slide plot">
+                <div class="image-container">
+                    <img id="mapImage1" src="/ebtmapweb_prj/coding_website/plot_image.png" alt="Intensity Plot">
+                </div>
+            </div>
+            <div class="swiper-slide plot">
+                <div class="image-container">
+                    <img id="mapImage2" src="/ebtmapweb_prj/coding_website/cropped_map_image.png" alt="Map Image">
+                </div>
+            </div>
+            <div class="swiper-slide plot">
+                <<div class="image-container">
+                    <img id="mapImage3" src="/ebtmapweb_prj/coding_website/kontur_tertentu.png" alt="Contour Image">
+                </div>
+            </div>
+        </div>
+        <!-- Add Navigation Arrows -->
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+    </div>
+
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .swiper-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: auto;
+        }
+        
+        .image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+        
+        .image-container img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            max-width: 100%;
+        }
+    </style>
+    
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script src="result.js"></script>
+    <script>
+        var swiper = new Swiper('.swiper-container', {
+          navigation: {
+              nextEl: '.swiper-button-next',
+              prevEl: '.swiper-button-prev',
+          },
+        }); 
+        
+        function getQueryParams() {
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            const selectedMonth = urlParams.get('month');
+            const selectedYear = urlParams.get('year');
+            return { selectedMonth, selectedYear };
+        }
+        
+        // Function to set page title with selected month and year
+        function setPageTitle() {
+            const { selectedMonth, selectedYear } = getQueryParams();
+            const pageTitle = document.getElementById('pageTitle');
+            pageTitle.innerText = `- ${selectedMonth} ${selectedYear}`;
+        }
+        
+        // Call setPageTitle function when the page loads
+        setPageTitle();
+    </script>
+</body>
+</html>
