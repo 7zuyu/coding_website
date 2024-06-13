@@ -19,58 +19,239 @@ ini kode html
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script> <!-- Menambahkan script HTML2Canvas untuk mengonversi elemen HTML menjadi gambar -->
   </head>  
 <body>
-  <header>
-    <h1>Calculate Open Area</h1>
-      <button id="startDrawing">Start Drawing</button> <!-- Button to start drawing on the map -->
-      <button id="finishDrawing">Finish Drawing</button> <!-- Button to finish drawing on the map -->
-      <button id="osmTiles">Show OSM Tiles</button> <!-- Button to show OSM tiles -->
-      <button id="cartoTiles">Show CARTO Tiles</button> <!-- Button to show CARTO tiles -->
-      <label for="month">Select Month:</label> <!-- Label for month selection -->
-      <select id="month">
-        <option value="January">January</option>
-        <option value="February">February</option>
-        <option value="March">March</option>
-        <option value="April">April</option>
-        <option value="May">May</option>
-        <option value="June">June</option>
-        <option value="July">July</option>
-        <option value="August">August</option>
-        <option value="September">September</option>
-        <option value="October">October</option>
-        <option value="November">November</option>
-        <option value="December">December</option>
-      </select>
-      <label for="year">Select Year:</label>
-      <select id="year">
-        <option value="2011">2011</option>
-        <option value="2012">2012</option>
-        <option value="2013">2013</option>
-        <option value="2014">2014</option>
-        <option value="2015">2015</option>
-        <option value="2016">2016</option>
-        <option value="2017">2017</option>
-        <option value="2018">2018</option>
-        <option value="2019">2019</option>
-        <option value="2020">2020</option>
-      </select>
-  </header>
-  <section class="home">
-    <div id="result"></div>
-    <div id="mapContainer">
-    <div id="map"></div>
-    </div>    
-    <div id="intensity-result" style="position: relative; width: 100%; max-width: 300px; margin: auto; display: none;">
-      <h2>GHI Data</h2>
-      <button id="close-intensity" style="position: absolute; top: 0; right: 0;">&times;</button>
-      <ul id="intensity-list" class="ghi-popup-content"></ul>
+    <div id="sidebar">
+      <div class="pcu-img">
+        <img src="pcu.png" alt="" style="width: 100px; display: block; margin: 0 auto;">
+      </div>
+      <div class="pcu-details" style="text-align: center; margin-bottom: 20px;">
+        <p class="title">Final Assignment Project</p>
+        <p class="name">Geography Information System</p>
+      </div>
+      <a href="index.html">Dashboard</a>
+      <a href="luasatapbangunan.html">Building Roof Area Calculation</a>
+      <div class="legend-image" style="padding: 10px;">
+        <img src="Legend.png" alt="" style="width: 100%;">
+      </div>
+      <div style="padding: 10px;">
+        <p>The data is collected from 08:00 to 16:00 local time.</p>
+      </div>
+      <div style="padding: 10px;">
+        <p><b>GP = SR * CA * 8 * T</b></p>
+        <p>Dimana:</p>
+        <p>GP = Total GHI </p>
+        <p>SR = Sum of GHI Data</p>
+        <p>CA = Available Area</p>
+        <p>8 = 8 hours a day (08:00 to 16:00)</p>
+        <p>T = Total days in selected month and selected year</p>
+      </div>
+      <div style="padding: 10px;">
+        <p>Made by:</p>
+        <div style="display: flex; align-items: center;">
+          <img src="user.jpg" alt="" style="width: 50px; border-radius: 50%; margin-right: 10px;">
+          <div>
+            <p>Web Content: Anthony Hendrata (C11200007)</p>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; margin-top: 10px;">
+          <img src="user.jpg" alt="" style="width: 50px; border-radius: 50%; margin-right: 10px;">
+          <div>
+            <p>Design & Web Developer: Christian Reyner (C11200029)</p>
+          </div>
+        </div>
+      </div>
     </div>
-    <div id="plot-container" style="position: relative; display: none;">
-      <h2>Intensity Plot</h2>
-      <button id="close-plot" style="position: absolute; top: 0; right: 0;">&times;</button>
-      <img id="intensity-plot" alt="Intensity Plot" />
-    </div>
-    <div id="mapImageContainer"></div>
-  </section>
+    <div class="content">
+      <section id="header">
+        <div class="content">
+          <header>
+            <h1>Calculate Open Area</h1>
+            <button id="startDrawing">Start Drawing</button>
+            <button id="finishDrawing">Finish Drawing</button>
+            <button id="osmTiles">Show OSM Tiles</button>
+            <button id="cartoTiles">Show CARTO Tiles</button>
+            <label for="month">Select Month:</label>
+            <select id="month">
+              <option value="January">January</option>
+              <option value="February">February</option>
+              <option value="March">March</option>
+              <option value="April">April</option>
+              <option value="May">May</option>
+              <option value="June">June</option>
+              <option value="July">July</option>
+              <option value="August">August</option>
+              <option value="September">September</option>
+              <option value="October">October</option>
+              <option value="November">November</option>
+              <option value="December">December</option>
+            </select>
+            <label for="year">Select Year:</label>
+            <select id="year">
+              <option value="2011">2011</option>
+              <option value="2012">2012</option>
+              <option value="2013">2013</option>
+              <option value="2014">2014</option>
+              <option value="2015">2015</option>
+              <option value="2016">2016</option>
+              <option value="2017">2017</option>
+              <option value="2018">2018</option>
+              <option value="2019">2019</option>
+              <option value="2020">2020</option>
+            </select>
+          </header>
+        </div>
+</section>
+<section class="home">
+  <div id="result"></div>
+  <div id="mapContainer">
+  <div id="map"></div>
+  </div>    
+  <div id="intensity-result" style="position: relative; width: 100%; max-width: 300px; margin: auto; display: none;">
+    <h2>GHI Data</h2>
+    <button id="close-intensity" style="position: absolute; top: 0; right: 0;">&times;</button>
+    <ul id="intensity-list" class="ghi-popup-content"></ul>
+  </div>
+  <div id="plot-container" style="position: relative; display: none;">
+    <h2>Intensity Plot</h2>
+    <button id="close-plot" style="position: absolute; top: 0; right: 0;">&times;</button>
+    <img id="intensity-plot" alt="Intensity Plot" />
+  </div>
+  <div id="mapImageContainer"></div>
+</section>
+<style>
+  /* Style untuk animasi loading */
+  #loading {
+    display: none; /* Awalnya disembunyikan */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 1000;
+    text-align: center;
+    font-size: 24px;
+    color: #000;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  #loading .spinner {
+    border: 16px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 16px solid #3498db;
+    width: 120px;
+    height: 120px;
+    margin-bottom: 20px; /* Tambahkan margin bawah untuk memberi jarak antara spinner dan teks */
+    animation: spin 2s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
+  .leaflet-container {
+    height: 100%;
+    width: 100%;
+  }
+  #close-plot, #close-intensity {
+    background: none;
+    border: none;
+    font-size: 3em;
+    cursor: pointer;
+  }
+  #close-plot:hover, #close-intensity:hover {
+    color: red;
+  }
+  #intensity-result {
+    position: absolute;
+    width: 100%;
+    max-width: 310px;
+    margin: auto;
+    display: none;
+    overflow-y: scroll;
+    max-height: 700px;
+  }
+  #intensity-list {
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+  }
+  .ghi-popup-content {
+    font-size: 0.8em; /* Adjust the font size as needed */
+  }
+  /* Memperbesar tombol zoom */
+  .leaflet-control-zoom-in,
+  .leaflet-control-zoom-out {
+  font-size: 30px !important; /* Ukuran font ditingkatkan */
+  width: 40px !important; /* Lebar tombol ditingkatkan */
+  height: 40px !important; /* Tinggi tombol ditingkatkan */
+  line-height: 40px !important; /* Tinggi garis ditingkatkan untuk sentralisasi teks */
+  }
+  /* Memperbesar kontrol gambar */
+  .leaflet-draw-toolbar a {
+    width: 40px !important; /* Lebar tombol ditingkatkan */
+    height: 40px !important; /* Tinggi tombol ditingkatkan */
+    line-height: 40px !important; /* Tinggi garis ditingkatkan untuk sentralisasi teks */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px; /* ukuran ikon */
+  }
+  .leaflet-draw-toolbar a i,
+  .leaflet-draw-toolbar a svg {
+      width: 30px !important; /* Lebar ikon ditingkatkan */
+      height: 30px !important; /* Tinggi ikon ditingkatkan */
+  }
+  /* Tambahkan ini untuk memperbesar ikon dalam tombol draw toolbar */
+  .leaflet-draw-toolbar a svg {
+      width: 40px !important;
+      height: 40px !important;
+  }
+
+  #header {
+    background-color: #f8f8f8;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  #header button, #header select {
+    margin: 5px;
+    padding: 10px;
+    font-size: 14px;
+  }
+  #sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 84.4%;
+    width: 250px;
+    background-color: #333;
+    padding-top: 20px;
+    margin-top: 4.6%;
+    color: white;
+    overflow-y: auto;
+  }
+  #sidebar a {
+    padding: 5px 10px;
+    text-decoration: none;
+    font-size: 18px;
+    color: white;
+    display: block;
+  }
+  #sidebar a:hover {
+    background-color: #575757;
+  }
+  .content {
+    margin-left: 250px;
+    padding: 0px;
+  }
+</style>
   <footer>
     <div class="bottom">
       <!-- <p id="area-info">Total Area: 0 m<sup>2</sup></p> -->
@@ -81,103 +262,7 @@ ini kode html
       <p id="total-ghi">Total GHI: 0 kWh/month</p>
   </div>
 </footer>
-  <style>
-    /* Style untuk animasi loading */
-    #loading {
-      display: none; /* Awalnya disembunyikan */
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.8);
-      z-index: 1000;
-      text-align: center;
-      font-size: 24px;
-      color: #000;
-      display: flex;
-      justify-content: center;
-      flex-direction: column;
-    }
-
-    #loading .spinner {
-      border: 16px solid #f3f3f3;
-      border-radius: 50%;
-      border-top: 16px solid #3498db;
-      width: 120px;
-      height: 120px;
-      margin-bottom: 20px; /* Tambahkan margin bawah untuk memberi jarak antara spinner dan teks */
-      animation: spin 2s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    html, body {
-      height: 100%;
-      margin: 0;
-    }
-    .leaflet-container {
-      height: 70%;
-      width: 100%;
-    }
-    #close-plot, #close-intensity {
-      background: none;
-      border: none;
-      font-size: 3em;
-      cursor: pointer;
-    }
-    #close-plot:hover, #close-intensity:hover {
-      color: red;
-    }
-    #intensity-result {
-      position: relative;
-      width: 100%;
-      max-width: 310px;
-      margin: auto;
-      display: none;
-      overflow-y: scroll;
-      max-height: 700px;
-    }
-    #intensity-list {
-      padding: 0;
-      margin: 0;
-      list-style-type: none;
-    }
-    .ghi-popup-content {
-      font-size: 0.8em; /* Adjust the font size as needed */
-    }
-    /* Memperbesar tombol zoom */
-    .leaflet-control-zoom-in,
-    .leaflet-control-zoom-out {
-    font-size: 30px !important; /* Ukuran font ditingkatkan */
-    width: 40px !important; /* Lebar tombol ditingkatkan */
-    height: 40px !important; /* Tinggi tombol ditingkatkan */
-    line-height: 40px !important; /* Tinggi garis ditingkatkan untuk sentralisasi teks */
-    }
-    /* Memperbesar kontrol gambar */
-    .leaflet-draw-toolbar a {
-      width: 40px !important; /* Lebar tombol ditingkatkan */
-      height: 40px !important; /* Tinggi tombol ditingkatkan */
-      line-height: 40px !important; /* Tinggi garis ditingkatkan untuk sentralisasi teks */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 30px; /* ukuran ikon */
-    }
-    .leaflet-draw-toolbar a i,
-    .leaflet-draw-toolbar a svg {
-        width: 30px !important; /* Lebar ikon ditingkatkan */
-        height: 30px !important; /* Tinggi ikon ditingkatkan */
-    }
-    /* Tambahkan ini untuk memperbesar ikon dalam tombol draw toolbar */
-    .leaflet-draw-toolbar a svg {
-        width: 40px !important;
-        height: 40px !important;
-    }
-  </style>
+  
   <script>
     const map = L.map('map').setView([-7.33, 112.72], 18);
 
@@ -219,7 +304,7 @@ ini kode html
           year: selectedYear
       };
 
-      fetch('http://localhost:5000/get_intensitas', {
+      fetch('http://localhost:5000/post_intensitas', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json'
@@ -233,7 +318,7 @@ ini kode html
           return response.json();
       })
       .then(data => {
-          popup.setContent(`Lat: ${latlng.lat.toFixed(2)}, Lon: ${latlng.lng.toFixed(2)}.<br>GHI: ${data.intensitas.toFixed(2)} Wh/m2`);
+          popup.setContent(`Lat: ${latlng.lat.toFixed(2)}, Lon: ${latlng.lng.toFixed(2)}.<br>GHI: ${data.intensitas.toFixed(2)} Wh/m²/day`);
       })
       .catch(error => {
           console.error('Error:', error);
@@ -449,12 +534,22 @@ function sendDataToServer(data, selectedMonth, selectedYear) {
       return;
   }
 
+  // Definisi fungsi formatNumber
+function formatNumber1(number) {
+  if (number >= 1000000) {
+      return (number / 1000000).toFixed(2) + " GWh/month";
+  } else if (number >= 1000) {
+      return (number / 1000).toFixed(2) + " MWh/month";
+  } else {
+      return number.toFixed(2) + " kWh/month";
+  }
+}
   // Memanggil fetchAnalyzePolygonImage untuk mendapatkan nilai areaTertentu
 fetchAnalyzePolygonImage().then(areaTertentu => {
   // Menunda eksekusi selama 2 detik
   setTimeout(() => {
       // Melakukan fetch ke server untuk mendapatkan data total GHI
-      fetch('http://localhost:5000/get_coordinates_with_intensity', {
+      fetch('http://localhost:5000/post_coordinates_with_intensity', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json'
@@ -475,7 +570,7 @@ fetchAnalyzePolygonImage().then(areaTertentu => {
             console.log(areaTertentu)
               // Mengalikan nilai total GHI dengan nilai areaTertentu
               let totalGHI = data.total_GHI * areaTertentu;
-              document.getElementById('total-ghi').textContent = `Total GHI: ${formatNumber(totalGHI.toFixed(2))} kWh/month`;
+              document.getElementById('total-ghi').textContent = `Total GHI: ${formatNumber(formatNumber1((totalGHI.toFixed(2))))}`;
           } else {
               console.error('Invalid total GHI or specific area:', data.total_GHI, areaTertentu);
           }
@@ -489,7 +584,7 @@ fetchAnalyzePolygonImage().then(areaTertentu => {
 });
 
 
-  fetch('http://localhost:5000/get_intensity_plot', {
+  fetch('http://localhost:5000/post_intensity_plot', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json'
@@ -521,7 +616,7 @@ fetchAnalyzePolygonImage().then(areaTertentu => {
       Object.entries(intensityData).forEach(([coord, intensity]) => {
           const [latitude, longitude] = coord.split(',').map(parseFloat);
           const listItem = document.createElement('li');
-          listItem.textContent = `Lat: ${latitude.toFixed(2)}, Lon: ${longitude.toFixed(2)}, GHI: ${formatNumber(intensity.toFixed(2))} Wh/m2`;
+          listItem.textContent = `Lat: ${latitude.toFixed(2)}, Lon: ${longitude.toFixed(2)}, GHI: ${formatNumber(intensity.toFixed(2))} Wh/m²/day`;
           intensityList.appendChild(listItem);
       });
     }
@@ -618,7 +713,7 @@ fetchAnalyzePolygonImage().then(areaTertentu => {
         year: selectedYear
       };
 
-      fetch('http://localhost:5000/get_intensitas', {
+      fetch('http://localhost:5000/post_intensitas', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -629,7 +724,7 @@ fetchAnalyzePolygonImage().then(areaTertentu => {
       .then(data => {
         popup
           .setLatLng(e.latlng)
-          .setContent(`Lat:${e.latlng.lat.toFixed(2)}, Long:${e.latlng.lng.toFixed(2)} <br>GHI : ${data.intensitas.toFixed(2)} Wh/m2`)
+          .setContent(`Lat:${e.latlng.lat.toFixed(2)}, Long:${e.latlng.lng.toFixed(2)} <br>GHI : ${data.intensitas.toFixed(2)} Wh/m²`)
           .openOn(map);
       })
       .catch(error => {
