@@ -65,8 +65,8 @@ def find_intensity(latitude, longitude, month, year):
         if connection:
             connection.close()
 
-@app.route('/get_intensitas', methods=['POST'])
-def get_intensitas():
+@app.route('/post_intensitas', methods=['POST'])
+def post_intensitas():
     data = request.json
 
     if not all(key in data for key in ['latitude', 'longitude', 'month', 'year']):
@@ -106,8 +106,8 @@ def generate_grid_coordinates(polygon_coords, step=0.04):
 
 global_persentase_luas = 0
 
-@app.route('/get_coordinates_with_intensity', methods=['POST'])
-def get_coordinates_with_intensity():
+@app.route('/post_coordinates_with_intensity', methods=['POST'])
+def post_coordinates_with_intensity():
     data = request.json
 
     if 'features' not in data:
@@ -165,8 +165,8 @@ def get_coordinates_with_intensity():
     return jsonify({'coordinates': coordinates, 'intensity_data': intensity_data, 'total_GHI': total_GHI1})
 
 
-@app.route('/get_intensity_plot', methods=['POST'])
-def get_intensity_plot():
+@app.route('/post_intensity_plot', methods=['POST'])
+def post_intensity_plot():
     data = request.json
 
     if 'features' not in data:
