@@ -54,20 +54,35 @@
             <button id="finishDrawing">Finish Drawing</button>
             <button id="osmTiles">Show OSM Tiles</button>
             <button id="cartoTiles">Show CARTO Tiles</button>
-            <div class="bucket">
-              <label for="month-input">Select month & year:</label>
-              <input type="month" id="month-input" name="month-input" min="2011-01" max="2020-12">
-              <div id="month-tags" class="month-tags"></div>
-          </div>
-          <script>
-              const monthInput = document.getElementById('month-input');
-              const monthTags = document.getElementById('month-tags');
-
-              monthInput.addEventListener('change', () => {
-                  const selectedMonth = new Date(monthInput.value);
-                  const monthName = selectedMonth.toLocaleString('default', { month: 'long' });
-              });
-          </script>
+            
+          <label for="month">Select Month:</label>
+            <select id="month">
+              <option value="January">January</option>
+              <option value="February">February</option>
+              <option value="March">March</option>
+              <option value="April">April</option>
+              <option value="May">May</option>
+              <option value="June">June</option>
+              <option value="July">July</option>
+              <option value="August">August</option>
+              <option value="September">September</option>
+              <option value="October">October</option>
+              <option value="November">November</option>
+              <option value="December">December</option>
+            </select>
+            <label for="year">Select Year:</label>
+            <select id="year">
+              <option value="2011">2011</option>
+              <option value="2012">2012</option>
+              <option value="2013">2013</option>
+              <option value="2014">2014</option>
+              <option value="2015">2015</option>
+              <option value="2016">2016</option>
+              <option value="2017">2017</option>
+              <option value="2018">2018</option>
+              <option value="2019">2019</option>
+              <option value="2020">2020</option>
+            </select>
       </div>
           </header>
 </section>
@@ -368,14 +383,15 @@
     marker.on('popupopen', function() {
       const popup = this.getPopup();
       const latlng = this.getLatLng();
-      const selectedMonth = document.getElementById('month-input').value;
-      const selectedYear = document.getElementById('month-input').value;
+      const selectedMonth = document.getElementById('month').value;
+      const selectedYear = document.getElementById('year').value;
+
       const data = {
-          latitude: latlng.lat,
-          longitude: latlng.lng,
-          month: selectedMonth,
-          year: selectedYear
-      };
+        latitude: latlng.lat,
+        longitude: latlng.lng,
+        month: selectedMonth,
+        year: selectedYear
+    };
 
       fetch('http://localhost:5000/post_intensitas', {
           method: 'POST',
@@ -776,8 +792,8 @@ fetchAnalyzePolygonImage().then(areaTertentu => {
       }
 
     function onMapClick(e) {
-      const selectedMonth = document.getElementById('month-input').value;
-      const selectedYear = document.getElementById('month-input').value;
+      const selectedMonth = document.getElementById('month').value;
+      const selectedYear = document.getElementById('year').value;
 
       const data = {
         latitude: e.latlng.lat,
