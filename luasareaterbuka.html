@@ -8,7 +8,7 @@ ini kode html
     <title>Open Area Calculation</title> <!-- Judul halaman web -->
     <link rel="icon" href="pcu.png" type="image/x-icon"> <!-- Menambahkan favicon -->
     <!-- Stylesheets dan Favicon -->
-    <link rel="stylesheet" href="luasatapbangunan.css"> <!-- Menambahkan stylesheet khusus -->
+    <link rel="stylesheet" href="luasareaterbuka.css"> <!-- Menambahkan stylesheet khusus -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/><!-- Menambahkan ikon dari Font Awesome -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/> <!-- Menambahkan library Leaflet untuk peta -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw/dist/leaflet.draw.css"/>
@@ -495,11 +495,11 @@ document.getElementById('finishDrawing').onclick = function() {
       sendDataToServer(features, selectedMonth, selectedYear);
     }, 1200)
     
-    //setTimeout(function() {
-       // window.open(`result_area_terbuka.html?month=${selectedMonth}&year=${selectedYear}`, '_blank');
+    setTimeout(function() {
+        window.open(`result_area_terbuka.html?month=${selectedMonth}&year=${selectedYear}`, '_blank');
         // Sembunyikan animasi loading setelah membuka halaman baru
         //document.getElementById('loading').style.display = 'none';
-    //}, 5000); // Waktu dihitung dalam milidetik, 5000 untuk 5 detik
+    }, 5000); // Waktu dihitung dalam milidetik, 5000 untuk 5 detik
 };
 
     function updateAreaInfo(area) {
