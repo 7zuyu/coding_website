@@ -4,10 +4,10 @@
     <!-- Tag <head> berisi informasi penting terkait halaman web -->
     <meta charset="UTF-8"> <!-- Mendefinisikan pengkodean karakter -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Menyesuaikan tampilan sesuai lebar perangkat -->
-    <title>Building Roof Area Calculation</title> <!-- Judul halaman web -->
+    <title>Calculation of Building Roof Area</title> <!-- Judul halaman web -->
     <link rel="icon" href="pcu.png" type="image/x-icon"> <!-- Menambahkan favicon -->
     <!-- Stylesheets dan Favicon -->
-    <link rel="stylesheet" href="luasatapbangunan.css"> <!-- Menambahkan stylesheet khusus -->
+    <link rel="stylesheet" href="luasatapbangunan2.css"> <!-- Menambahkan stylesheet khusus -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/><!-- Menambahkan ikon dari Font Awesome -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/> <!-- Menambahkan library Leaflet untuk peta -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw/dist/leaflet.draw.css"/>
@@ -16,60 +16,315 @@
     <script src="https://unpkg.com/leaflet-draw/dist/leaflet.draw.js"></script> <!-- Menambahkan script untuk fitur menggambar pada peta -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Turf.js/5.1.6/turf.min.js"></script> <!-- Menambahkan script Turf.js untuk analisis spasial -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script> <!-- Menambahkan script HTML2Canvas untuk mengonversi elemen HTML menjadi gambar -->
+  
+    <style>
+      body, html {
+          height: 100%;
+          margin: 0;
+          overflow: visible;
+      }
+
+      .leaflet-container {
+          width: 100%;
+          height: 100%;
+          left: 15%;
+      }
+
+      .packet {
+          display: flex;
+          width: 100%;
+          height: 100vh;
+          overflow: hidden;
+      }
+
+      .content {
+          flex-grow: 1;
+          overflow: auto;
+          padding: 20px;
+      }
+      
+  </style>
   </head>  
 <body>
-  <header>
-    <h1>Calculate Building Roof Area</h1>
-      <button id="startDrawing">Start Drawing</button> <!-- Button to start drawing on the map -->
-      <button id="finishDrawing">Finish Drawing</button> <!-- Button to finish drawing on the map -->
-      <button id="osmTiles">Show OSM Tiles</button> <!-- Button to show OSM tiles -->
-      <button id="cartoTiles">Show CARTO Tiles</button> <!-- Button to show CARTO tiles -->
-      <label for="month">Select Month:</label> <!-- Label for month selection -->
-      <select id="month">
-        <option value="January">January</option>
-        <option value="February">February</option>
-        <option value="March">March</option>
-        <option value="April">April</option>
-        <option value="May">May</option>
-        <option value="June">June</option>
-        <option value="July">July</option>
-        <option value="August">August</option>
-        <option value="September">September</option>
-        <option value="October">October</option>
-        <option value="November">November</option>
-        <option value="December">December</option>
-      </select>
-      <label for="year">Select Year:</label>
-      <select id="year">
-        <option value="2011">2011</option>
-        <option value="2012">2012</option>
-        <option value="2013">2013</option>
-        <option value="2014">2014</option>
-        <option value="2015">2015</option>
-        <option value="2016">2016</option>
-        <option value="2017">2017</option>
-        <option value="2018">2018</option>
-        <option value="2019">2019</option>
-        <option value="2020">2020</option>
-      </select>
-  </header>
-  <section class="home">
-    <div id="result"></div>
-    <div id="mapContainer">
-    <div id="map"></div>
-    </div>    
-    <div id="intensity-result" style="position: relative; width: 100%; max-width: 300px; margin: auto; display: none;">
-      <h2>GHI Data</h2>
-      <button id="close-intensity" style="position: absolute; top: 0; right: 0;">&times;</button>
-      <ul id="intensity-list" class="ghi-popup-content"></ul>
-    </div>
-    <div id="plot-container" style="position: relative; display: none;">
-      <h2>Intensity Plot</h2>
-      <button id="close-plot" style="position: absolute; top: 0; right: 0;">&times;</button>
-      <img id="intensity-plot" alt="Intensity Plot" />
-    </div>
-    <div id="mapImageContainer"></div>
-  </section>
+      <section id="header">
+        <div class="content">
+          <header>
+            <h1>Calculation of Building Roof Area</h1>
+            <button id="startDrawing">Start Drawing</button>
+            <button id="finishDrawing">Finish Drawing</button>
+            <button id="osmTiles">Show OSM Tiles</button>
+            <button id="cartoTiles">Show CARTO Tiles</button>
+            <div class="bucket">
+              <label for="month-input">Select month & year:</label>
+              <input type="month" id="month-input" name="month-input" min="2011-01" max="2020-12">
+              <div id="month-tags" class="month-tags"></div>
+          </div>
+          <script>
+              const monthInput = document.getElementById('month-input');
+              const monthTags = document.getElementById('month-tags');
+
+              monthInput.addEventListener('change', () => {
+                  const selectedMonth = new Date(monthInput.value);
+                  const monthName = selectedMonth.toLocaleString('default', { month: 'long' });
+              });
+          </script>
+      </div>
+          </header>
+</section>
+<section id="packet">
+  <div class="packet">
+      <div class="sidebar">
+          <div class="head">
+              <div class="pcu-img">
+                  <img src="pcu.png" alt="">
+              </div>
+              <div class="pcu-details">
+                  <p class="title">final assignment project</p>
+                  <p class="name">Geography Information System</p>
+              </div>
+          </div>
+          <div class="nav">
+              <div class="menu">
+                  <p class="title">Main</p>
+                  <ul>
+                      <li>
+                          <a href="index.html">
+                              <i class="icon ph-bold ph-house"></i>
+                              <span class="text">Dashboard</span>
+                          </a>
+                      </li>
+                      <li>
+                          <a href="luasareaterbuka.html">
+                              <i class="icon ph-bold ph-caret-right"></i>
+                              <span class="text">Open Area Calculation</span>
+                          </a>
+                      </li>
+                  </ul>
+              </div>
+              <div class="menu">
+                  <p class="title">Information</p>
+                  <p class="mapkey"><span class="hurufbesar"><b>map key</b></span></p>
+                  <ul>
+                      <li>
+                              <img src="Legend.jpg" alt="" class="legend-image">
+                          </a>
+                      </li>
+                  </ul>
+                  <p class="note"><span class="hurufbesar">t</span>he data is collected from 08:00 until 16:00 local time.</p>
+              </div>
+              <div class="menu">
+                  <p class="title">Formula</p>
+                  <ul>
+                      <li>
+                          <p class="rumus"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GP = SR * CA * T * 8 * α * φ</b></p>
+                          <p class="subtitle">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dimana:<br></p>
+                          <div class="hurufbesar">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gp&nbsp;=&nbsp;<span class="hurufkecil"><span class="hurufbesar">p</span>otensi&nbsp;<span class="hurufbesar">e</span>nergi&nbsp;<span class="hurufbesar">l</span>istrik</span>&nbsp;<span class="word">(MW<span class="hurufkecil">h</span>).</div>
+                          <div class="hurufbesar">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sr&nbsp;=&nbsp;<span class="hurufkecil"><span class="hurufbesar">r</span>adiasi cahaya matahari</span>&nbsp;<span class="hurufbesar">(<span class="word">MW<span class="hurufkecil">h</span>/<span class="hurufkecil">km</span><sup>2</sup><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/<span class="hurufkecil">tahun).</span></div>
+                          <div class="hurufbesar">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ca&nbsp;=&nbsp;<span class="hurufkecil"><span class="hurufbesar">l</span>uas atap yang tersedia untuk panel<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;surya</span>&nbsp;<span class="hurufkecil">(m<sup>2</sup>).</span></p>
+                          <p class="hurufbesar">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span class="hurufkecil"><span class="hurufbesar">w</span>aktu dalam harian, bulanan atau<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tahunan.</span></p>
+                          <p class="hurufkecil">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;8&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span class="hurufbesar">t</span>he time period taken is 8 hours per<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;day (08:00 to 16:00).</p>
+                          <p class="hurufkecil">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span class="hurufbesar">t</span>otal days in selected month and<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;selected year.</p>
+                          <p class="hurufkecil">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;φ&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span class="hurufbesar">t</span>he shape of the building roof on the<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;installation of rooftop PV is 80%.</p>
+                      </li>
+                  </ul>
+              </div>
+              <div class="menu">
+                  <p class="title">Made by</p>
+                  <div class="bottom1">
+                      <div class="user-img">
+                          <img src="user.jpg" alt="">  
+                      </div>
+                      <div class="user-details">
+                          <p class="title">Open Area Calculation</p>
+                          <p class="name">Anthony Hendrata</p>
+                          <p class="name">C11200007</p>
+                      </div>
+                  </div>
+                  <div class="bottom2">
+                      <div class="user-img">
+                          <img src="user.jpg" alt="">  
+                      </div>
+                      <div class="user-details">
+                          <p class="title">Calculation of Building Roof Area</p>
+                          <p class="name">Christian Reyner</p>
+                          <p class="name">C11200029</p>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <script>
+  window.addEventListener('scroll', function() {
+    const sidebar = document.getElementById('packet');
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const viewportHeight = window.innerHeight;
+    const sidebarHeight = sidebar.offsetHeight;
+  
+    if (scrollTop + viewportHeight >= sidebarHeight) {
+      sidebar.style.position = 'absolute';
+      sidebar.style.top = (scrollTop + viewportHeight - sidebarHeight) + 'px';
+    } else {
+      sidebar.style.position = 'fixed';
+      sidebar.style.top = '0px';
+    }
+  });
+</script>
+</section>
+
+<section class="home">
+  <div id="result"></div>
+  <div id="mapContainer">
+  <div id="map"></div>
+  </div>    
+  <div id="intensity-result" style="position: relative; width: 100%; max-width: 300px; margin: auto; display: none;">
+    <h2>GHI Data</h2>
+    <button id="close-intensity" style="position: absolute; top: 0; right: 0;">&times;</button>
+    <ul id="intensity-list" class="ghi-popup-content"></ul>
+  </div>
+  <div id="plot-container" style="position: relative; display: none;">
+    <h2>Intensity Plot</h2>
+    <button id="close-plot" style="position: absolute; top: 0; right: 0;">&times;</button>
+    <img id="intensity-plot" alt="Intensity Plot" />
+  </div>
+  <div id="mapImageContainer"></div>
+</section>
+<style>
+  /* Style untuk animasi loading */
+  #loading {
+    display: none; /* Awalnya disembunyikan */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 1000;
+    text-align: center;
+    font-size: 24px;
+    color: #000;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  #loading .spinner {
+    border: 16px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 16px solid #3498db;
+    width: 120px;
+    height: 120px;
+    margin-bottom: 20px; /* Tambahkan margin bawah untuk memberi jarak antara spinner dan teks */
+    animation: spin 2s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
+  .leaflet-container {
+    height: 100%;
+    width: 100%;
+  }
+  #close-plot, #close-intensity {
+    background: none;
+    border: none;
+    font-size: 3em;
+    cursor: pointer;
+  }
+  #close-plot:hover, #close-intensity:hover {
+    color: red;
+  }
+  #intensity-result {
+    position: absolute;
+    width: 100%;
+    max-width: 310px;
+    margin: auto;
+    display: none;
+    overflow-y: scroll;
+    max-height: 700px;
+  }
+  #intensity-list {
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+  }
+  .ghi-popup-content {
+    font-size: 0.8em; /* Adjust the font size as needed */
+  }
+  /* Memperbesar tombol zoom */
+  .leaflet-control-zoom-in,
+  .leaflet-control-zoom-out {
+  font-size: 30px !important; /* Ukuran font ditingkatkan */
+  width: 40px !important; /* Lebar tombol ditingkatkan */
+  height: 40px !important; /* Tinggi tombol ditingkatkan */
+  line-height: 40px !important; /* Tinggi garis ditingkatkan untuk sentralisasi teks */
+  }
+  /* Memperbesar kontrol gambar */
+  .leaflet-draw-toolbar a {
+    width: 40px !important; /* Lebar tombol ditingkatkan */
+    height: 40px !important; /* Tinggi tombol ditingkatkan */
+    line-height: 40px !important; /* Tinggi garis ditingkatkan untuk sentralisasi teks */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px; /* ukuran ikon */
+  }
+  .leaflet-draw-toolbar a i,
+  .leaflet-draw-toolbar a svg {
+      width: 30px !important; /* Lebar ikon ditingkatkan */
+      height: 30px !important; /* Tinggi ikon ditingkatkan */
+  }
+  /* Tambahkan ini untuk memperbesar ikon dalam tombol draw toolbar */
+  .leaflet-draw-toolbar a svg {
+      width: 40px !important;
+      height: 40px !important;
+  }
+
+  #header {
+    background-color: #f8f8f8;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  #header button, #header select {
+    margin: 5px;
+    padding: 10px;
+    font-size: 14px;
+  }
+  #sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 84.4%;
+    width: 250px;
+    background-color: #333;
+    padding-top: 20px;
+    margin-top: 4.6%;
+    color: white;
+    overflow-y: auto;
+  }
+  #sidebar a {
+    padding: 5px 10px;
+    text-decoration: none;
+    font-size: 18px;
+    color: white;
+    display: block;
+  }
+  #sidebar a:hover {
+    background-color: #575757;
+  }
+  .content {
+    margin-left: 250px;
+    padding: 0px;
+  }
+</style>
   <footer>
     <div class="bottom">
       <!-- <p id="area-info">Total Area: 0 m<sup>2</sup></p> -->
@@ -80,103 +335,7 @@
       <p id="total-ghi">Total GHI: 0 kWh/month</p>
   </div>
 </footer>
-  <style>
-    /* Style untuk animasi loading */
-    #loading {
-      display: none; /* Awalnya disembunyikan */
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.8);
-      z-index: 1000;
-      text-align: center;
-      font-size: 24px;
-      color: #000;
-      display: flex;
-      justify-content: center;
-      flex-direction: column;
-    }
-
-    #loading .spinner {
-      border: 16px solid #f3f3f3;
-      border-radius: 50%;
-      border-top: 16px solid #3498db;
-      width: 120px;
-      height: 120px;
-      margin-bottom: 20px; /* Tambahkan margin bawah untuk memberi jarak antara spinner dan teks */
-      animation: spin 2s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    html, body {
-      height: 100%;
-      margin: 0;
-    }
-    .leaflet-container {
-      height: 70%;
-      width: 100%;
-    }
-    #close-plot, #close-intensity {
-      background: none;
-      border: none;
-      font-size: 3em;
-      cursor: pointer;
-    }
-    #close-plot:hover, #close-intensity:hover {
-      color: red;
-    }
-    #intensity-result {
-      position: relative;
-      width: 100%;
-      max-width: 310px;
-      margin: auto;
-      display: none;
-      overflow-y: scroll;
-      max-height: 700px;
-    }
-    #intensity-list {
-      padding: 0;
-      margin: 0;
-      list-style-type: none;
-    }
-    .ghi-popup-content {
-      font-size: 0.8em; /* Adjust the font size as needed */
-    }
-    /* Memperbesar tombol zoom */
-    .leaflet-control-zoom-in,
-    .leaflet-control-zoom-out {
-    font-size: 30px !important; /* Ukuran font ditingkatkan */
-    width: 40px !important; /* Lebar tombol ditingkatkan */
-    height: 40px !important; /* Tinggi tombol ditingkatkan */
-    line-height: 40px !important; /* Tinggi garis ditingkatkan untuk sentralisasi teks */
-    }
-    /* Memperbesar kontrol gambar */
-    .leaflet-draw-toolbar a {
-      width: 40px !important; /* Lebar tombol ditingkatkan */
-      height: 40px !important; /* Tinggi tombol ditingkatkan */
-      line-height: 40px !important; /* Tinggi garis ditingkatkan untuk sentralisasi teks */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 30px; /* ukuran ikon */
-    }
-    .leaflet-draw-toolbar a i,
-    .leaflet-draw-toolbar a svg {
-        width: 30px !important; /* Lebar ikon ditingkatkan */
-        height: 30px !important; /* Tinggi ikon ditingkatkan */
-    }
-    /* Tambahkan ini untuk memperbesar ikon dalam tombol draw toolbar */
-    .leaflet-draw-toolbar a svg {
-        width: 40px !important;
-        height: 40px !important;
-    }
-  </style>
+  
   <script>
     const map = L.map('map').setView([-7.33, 112.72], 18);
 
@@ -209,8 +368,8 @@
     marker.on('popupopen', function() {
       const popup = this.getPopup();
       const latlng = this.getLatLng();
-      const selectedMonth = document.getElementById('month').value;
-      const selectedYear = document.getElementById('year').value;
+      const selectedMonth = document.getElementById('month-input').value;
+      const selectedYear = document.getElementById('month-input').value;
       const data = {
           latitude: latlng.lat,
           longitude: latlng.lng,
@@ -218,7 +377,7 @@
           year: selectedYear
       };
 
-      fetch('http://localhost:5000/get_intensitas', {
+      fetch('http://localhost:5000/post_intensitas', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json'
@@ -232,7 +391,7 @@
           return response.json();
       })
       .then(data => {
-          popup.setContent(`Lat: ${latlng.lat.toFixed(2)}, Lon: ${latlng.lng.toFixed(2)}.<br>GHI: ${data.intensitas.toFixed(2)} Wh/m2`);
+          popup.setContent(`Lat: ${latlng.lat.toFixed(2)}, Lon: ${latlng.lng.toFixed(2)}.<br>GHI: ${data.intensitas.toFixed(2)} Wh/m²/day`);
       })
       .catch(error => {
           console.error('Error:', error);
@@ -245,9 +404,9 @@
     const drawnItems = new L.FeatureGroup();
     const drawControl = new L.Control.Draw({
       draw: {
-          polygon: true,
+          polygon: false,
           polyline: false,
-          circle: true,
+          circle: false,
           marker: false,
           circlemarker: false,
           rectangle: true,
@@ -364,8 +523,8 @@ function sendImageToServer(imageData) {
 }
 
 document.getElementById('finishDrawing').onclick = function() {
-  const selectedMonth = document.getElementById('month').value;
-  const selectedYear = document.getElementById('year').value;
+  const selectedMonth = document.getElementById('month-input').value;
+  const selectedYear = document.getElementById('month-input').value;
 
   // Pengecekan apakah peta saat ini adalah Carto Tiles
   if (!map.hasLayer(cartoTiles)) {
@@ -410,7 +569,7 @@ document.getElementById('finishDrawing').onclick = function() {
     }, 1200)
     
     setTimeout(function() {
-        window.open(`result_atap.html?month=${selectedMonth}&year=${selectedYear}`, '_blank');
+        window.open(`result_area_terbuka.html?month=${selectedMonth}&year=${selectedYear}`, '_blank');
         // Sembunyikan animasi loading setelah membuka halaman baru
         //document.getElementById('loading').style.display = 'none';
     }, 5000); // Waktu dihitung dalam milidetik, 5000 untuk 5 detik
@@ -448,12 +607,22 @@ function sendDataToServer(data, selectedMonth, selectedYear) {
       return;
   }
 
+  // Definisi fungsi formatNumber
+function formatNumber1(number) {
+  if (number >= 1000000) {
+      return (number / 1000000).toFixed(2) + " GWh/month";
+  } else if (number >= 1000) {
+      return (number / 1000).toFixed(2) + " MWh/month";
+  } else {
+      return number.toFixed(2) + " kWh/month";
+  }
+}
   // Memanggil fetchAnalyzePolygonImage untuk mendapatkan nilai areaTertentu
 fetchAnalyzePolygonImage().then(areaTertentu => {
   // Menunda eksekusi selama 2 detik
   setTimeout(() => {
       // Melakukan fetch ke server untuk mendapatkan data total GHI
-      fetch('http://localhost:5000/get_coordinates_with_intensity', {
+      fetch('http://localhost:5000/post_coordinates_with_intensity', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json'
@@ -473,8 +642,8 @@ fetchAnalyzePolygonImage().then(areaTertentu => {
           if (!isNaN(data.total_GHI) && !isNaN(areaTertentu)) {
             console.log(areaTertentu)
               // Mengalikan nilai total GHI dengan nilai areaTertentu
-              let totalGHI = data.total_GHI * areaTertentu;
-              document.getElementById('total-ghi').textContent = `Total GHI: ${formatNumber(totalGHI.toFixed(2))} kWh/month`;
+              let totalGHI = data.total_GHI * areaTertentu * 0.8;
+              document.getElementById('total-ghi').textContent = `Total GHI: ${formatNumber(formatNumber1((totalGHI.toFixed(2))))}`;
           } else {
               console.error('Invalid total GHI or specific area:', data.total_GHI, areaTertentu);
           }
@@ -488,7 +657,7 @@ fetchAnalyzePolygonImage().then(areaTertentu => {
 });
 
 
-  fetch('http://localhost:5000/get_intensity_plot', {
+  fetch('http://localhost:5000/post_intensity_plot', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json'
@@ -520,7 +689,7 @@ fetchAnalyzePolygonImage().then(areaTertentu => {
       Object.entries(intensityData).forEach(([coord, intensity]) => {
           const [latitude, longitude] = coord.split(',').map(parseFloat);
           const listItem = document.createElement('li');
-          listItem.textContent = `Lat: ${latitude.toFixed(2)}, Lon: ${longitude.toFixed(2)}, GHI: ${formatNumber(intensity.toFixed(2))} Wh/m2`;
+          listItem.textContent = `Lat: ${latitude.toFixed(2)}, Lon: ${longitude.toFixed(2)}, GHI: ${formatNumber(intensity.toFixed(2))} Wh/m²/day`;
           intensityList.appendChild(listItem);
       });
     }
@@ -544,7 +713,7 @@ fetchAnalyzePolygonImage().then(areaTertentu => {
       // Mengembalikan promise untuk menunggu hasil fetch
       return new Promise((resolve, reject) => {
           // Mengirim permintaan POST ke server
-          fetch('http://localhost:5000/analyze_polygon_image_atap', {
+          fetch('http://localhost:5000/analyze_polygon_image_area_terbuka', {
                   method: 'POST',
                   headers: {
                       'Content-Type': 'application/json'
@@ -607,8 +776,8 @@ fetchAnalyzePolygonImage().then(areaTertentu => {
       }
 
     function onMapClick(e) {
-      const selectedMonth = document.getElementById('month').value;
-      const selectedYear = document.getElementById('year').value;
+      const selectedMonth = document.getElementById('month-input').value;
+      const selectedYear = document.getElementById('month-input').value;
 
       const data = {
         latitude: e.latlng.lat,
@@ -617,7 +786,7 @@ fetchAnalyzePolygonImage().then(areaTertentu => {
         year: selectedYear
       };
 
-      fetch('http://localhost:5000/get_intensitas', {
+      fetch('http://localhost:5000/post_intensitas', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -628,7 +797,7 @@ fetchAnalyzePolygonImage().then(areaTertentu => {
       .then(data => {
         popup
           .setLatLng(e.latlng)
-          .setContent(`Lat:${e.latlng.lat.toFixed(2)}, Long:${e.latlng.lng.toFixed(2)} <br>GHI : ${data.intensitas.toFixed(2)} Wh/m2`)
+          .setContent(`Lat:${e.latlng.lat.toFixed(2)}, Long:${e.latlng.lng.toFixed(2)} <br>GHI : ${data.intensitas.toFixed(2)} Wh/m²`)
           .openOn(map);
       })
       .catch(error => {
