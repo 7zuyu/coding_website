@@ -1,3 +1,4 @@
+ini kode html
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -303,7 +304,7 @@
           year: selectedYear
       };
 
-      fetch('http://203.189.122.12/post_intensitas', {
+      fetch('http://localhost:5000/post_intensitas', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json'
@@ -427,7 +428,7 @@
 
 // Fungsi untuk mengunggah gambar yang sudah dipotong ke server
 function sendImageToServer(imageData) {
-  fetch('http://203.189.122.12/save_cropped_map_image', {
+  fetch('http://localhost:5000/save_cropped_map_image', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -494,11 +495,11 @@ document.getElementById('finishDrawing').onclick = function() {
       sendDataToServer(features, selectedMonth, selectedYear);
     }, 1200)
     
-    setTimeout(function() {
-        window.open(`result_area_terbuka.html?month=${selectedMonth}&year=${selectedYear}`, '_blank');
+    //setTimeout(function() {
+       // window.open(`result_area_terbuka.html?month=${selectedMonth}&year=${selectedYear}`, '_blank');
         // Sembunyikan animasi loading setelah membuka halaman baru
         //document.getElementById('loading').style.display = 'none';
-    }, 5000); // Waktu dihitung dalam milidetik, 5000 untuk 5 detik
+    //}, 5000); // Waktu dihitung dalam milidetik, 5000 untuk 5 detik
 };
 
     function updateAreaInfo(area) {
@@ -548,7 +549,7 @@ fetchAnalyzePolygonImage().then(areaTertentu => {
   // Menunda eksekusi selama 2 detik
   setTimeout(() => {
       // Melakukan fetch ke server untuk mendapatkan data total GHI
-      fetch('http://203.189.122.12/post_coordinates_with_intensity', {
+      fetch('http://localhost:5000/post_coordinates_with_intensity', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json'
@@ -583,7 +584,7 @@ fetchAnalyzePolygonImage().then(areaTertentu => {
 });
 
 
-  fetch('http://203.189.122.12/post_intensity_plot', {
+  fetch('http://localhost:5000/post_intensity_plot', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json'
@@ -639,7 +640,7 @@ fetchAnalyzePolygonImage().then(areaTertentu => {
       // Mengembalikan promise untuk menunggu hasil fetch
       return new Promise((resolve, reject) => {
           // Mengirim permintaan POST ke server
-          fetch('http://203.189.122.12/analyze_polygon_image_area_terbuka', {
+          fetch('http://localhost:5000/analyze_polygon_image_area_terbuka', {
                   method: 'POST',
                   headers: {
                       'Content-Type': 'application/json'
@@ -680,7 +681,7 @@ fetchAnalyzePolygonImage().then(areaTertentu => {
   }
   
       function savePolygonImage(features) {
-        fetch('http://203.189.122.12/save_polygon_image', {
+        fetch('http://localhost:5000/save_polygon_image', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -712,7 +713,7 @@ fetchAnalyzePolygonImage().then(areaTertentu => {
         year: selectedYear
       };
 
-      fetch('http://203.189.122.12/post_intensitas', {
+      fetch('http://localhost:5000/post_intensitas', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
