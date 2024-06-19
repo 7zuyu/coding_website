@@ -304,7 +304,7 @@ ini kode html
           year: selectedYear
       };
 
-      fetch('http://localhost:5000/post_intensitas', {
+      fetch('http://aiot.petra.ac.id:5000/post_intensitas', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json'
@@ -428,7 +428,7 @@ ini kode html
 
 // Fungsi untuk mengunggah gambar yang sudah dipotong ke server
 function sendImageToServer(imageData) {
-  fetch('http://localhost:5000/save_cropped_map_image', {
+  fetch('http://aiot.petra.ac.id:5000/save_cropped_map_image', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -549,7 +549,7 @@ fetchAnalyzePolygonImage().then(areaTertentu => {
   // Menunda eksekusi selama 2 detik
   setTimeout(() => {
       // Melakukan fetch ke server untuk mendapatkan data total GHI
-      fetch('http://localhost:5000/post_coordinates_with_intensity', {
+      fetch('http://aiot.petra.ac.id:5000/post_coordinates_with_intensity', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json'
@@ -584,7 +584,7 @@ fetchAnalyzePolygonImage().then(areaTertentu => {
 });
 
 
-  fetch('http://localhost:5000/post_intensity_plot', {
+  fetch('http://aiot.petra.ac.id:5000/post_intensity_plot', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json'
@@ -640,7 +640,7 @@ fetchAnalyzePolygonImage().then(areaTertentu => {
       // Mengembalikan promise untuk menunggu hasil fetch
       return new Promise((resolve, reject) => {
           // Mengirim permintaan POST ke server
-          fetch('http://localhost:5000/analyze_polygon_image_area_terbuka', {
+          fetch('http://aiot.petra.ac.id:5000/analyze_polygon_image_area_terbuka', {
                   method: 'POST',
                   headers: {
                       'Content-Type': 'application/json'
@@ -681,7 +681,7 @@ fetchAnalyzePolygonImage().then(areaTertentu => {
   }
   
       function savePolygonImage(features) {
-        fetch('http://localhost:5000/save_polygon_image', {
+        fetch('http://aiot.petra.ac.id:5000/save_polygon_image', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -713,7 +713,7 @@ fetchAnalyzePolygonImage().then(areaTertentu => {
         year: selectedYear
       };
 
-      fetch('http://localhost:5000/post_intensitas', {
+      fetch('http://aiot.petra.ac.id:5000/post_intensitas', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
