@@ -446,7 +446,8 @@ def analyze_polygon_image_atap():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
+
 
 # Log server startup
 logging.info("Starting Flask server...")
