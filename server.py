@@ -66,7 +66,7 @@ def find_intensity(latitude, longitude, month, year):
         if connection:
             connection.close()
 
-@app.route('/post_intensitas', methods=['POST'])
+@app.route("/post_intensitas", methods=['POST'])
 def post_intensitas():
     data = request.json
 
