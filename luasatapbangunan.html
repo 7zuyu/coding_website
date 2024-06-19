@@ -54,8 +54,7 @@
             <button id="finishDrawing">Finish Drawing</button>
             <button id="osmTiles">Show OSM Tiles</button>
             <button id="cartoTiles">Show CARTO Tiles</button>
-            
-          <label for="month">Select Month:</label>
+            <label for="month">Select Month:</label>
             <select id="month">
               <option value="January">January</option>
               <option value="February">February</option>
@@ -121,7 +120,7 @@
                   <p class="mapkey"><span class="hurufbesar"><b>map key</b></span></p>
                   <ul>
                       <li>
-                              <img src="Legend.png" alt="" class="legend-image">
+                              <img src="Legend.jpg" alt="" class="legend-image">
                           </a>
                       </li>
                   </ul>
@@ -385,13 +384,12 @@
       const latlng = this.getLatLng();
       const selectedMonth = document.getElementById('month').value;
       const selectedYear = document.getElementById('year').value;
-
       const data = {
-        latitude: latlng.lat,
-        longitude: latlng.lng,
-        month: selectedMonth,
-        year: selectedYear
-    };
+          latitude: latlng.lat,
+          longitude: latlng.lng,
+          month: selectedMonth,
+          year: selectedYear
+      };
 
       fetch('http://localhost:5000/post_intensitas', {
           method: 'POST',
@@ -539,8 +537,8 @@ function sendImageToServer(imageData) {
 }
 
 document.getElementById('finishDrawing').onclick = function() {
-  const selectedMonth = document.getElementById('month-input').value;
-  const selectedYear = document.getElementById('month-input').value;
+  const selectedMonth = document.getElementById('month').value;
+  const selectedYear = document.getElementById('year').value;
 
   // Pengecekan apakah peta saat ini adalah Carto Tiles
   if (!map.hasLayer(cartoTiles)) {
@@ -658,7 +656,7 @@ fetchAnalyzePolygonImage().then(areaTertentu => {
           if (!isNaN(data.total_GHI) && !isNaN(areaTertentu)) {
             console.log(areaTertentu)
               // Mengalikan nilai total GHI dengan nilai areaTertentu
-              let totalGHI = data.total_GHI * areaTertentu * 0.8;
+              let totalGHI = data.total_GHI * areaTertentu;
               document.getElementById('total-ghi').textContent = `Total GHI: ${formatNumber(formatNumber1((totalGHI.toFixed(2))))}`;
           } else {
               console.error('Invalid total GHI or specific area:', data.total_GHI, areaTertentu);
