@@ -47,6 +47,7 @@ def create_connection():
 
 # Function to find light intensity based on coordinates
 def find_intensity(latitude, longitude, month, year):
+    connection = None  # Initialize connection variable
     try:
         connection = create_connection()
         if connection is None:
