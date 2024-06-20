@@ -655,7 +655,7 @@ fetchAnalyzePolygonImage().then(areaTertentu => {
           if (!isNaN(data.total_GHI) && !isNaN(areaTertentu)) {
             console.log(areaTertentu)
               // Mengalikan nilai total GHI dengan nilai areaTertentu
-              let totalGHI = data.total_GHI * areaTertentu;
+              let totalGHI = data.total_GHI * areaTertentu * 0.8;
               document.getElementById('total-ghi').textContent = `Total GHI: ${formatNumber(formatNumber1((totalGHI.toFixed(2))))}`;
           } else {
               console.error('Invalid total GHI or specific area:', data.total_GHI, areaTertentu);
